@@ -1,0 +1,81 @@
+// =====================================================================
+// Trident IT Promotional Offers Platform — Prisma Relational Schema
+// Models 1:N Supermarket-to-Offers and 1:N Offer-to-Redemptions
+// =====================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Supermarket {
+  id           String      @id @default(uuid())
+  name         String
+  slug         String      @unique
+  email        String      @unique
+  phone        String
+  address      String
+  city         String
+  state        String
+  postalCode   String
+  logoUrl      String?
+  apiKeyHash   String
+  apiKeyPrefix String
+  status       String      @default("ACTIVE") // ACTIVE, SUSPENDED, PENDING
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  offers       Offer[]
+
+  @@index([slug])
+  @@index([email])
+  @@index([city])
+  @@map("supermarkets")
+}
+
+model Offer {
+  id                  String        @id @default(uuid())
+  supermarketId       String
+  supermarket         Supermarket   @relation(fields: [supermarketId], references: [id], onDelete: Cascade)
+  title               String
+  description         String
+  category            String        // GROCERIES, PRODUCE, DAIRY, BAKERY, BEVERAGES, MEAT_SEAFOOD, HOUSEHOLD, SNACKS
+  discountType        String        // PERCENTAGE, FIXED_AMOUNT, BOGO, BUNDLE
+  discountValue       Float
+  originalPrice       Float?
+  discountedPrice     Float?
+  couponCode          String?
+  imageUrl            String?
+  termsAndConditions  String?
+  startDate           DateTime
+  endDate             DateTime
+  status              String        @default("ACTIVE") // ACTIVE, EXPIRED, DRAFT
+  maxRedemptions      Int?
+  currentRedemptions  Int           @default(0)
+  isFeatured          Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  redemptions         Redemption[]
+
+  @@index([supermarketId])
+  @@index([category])
+  @@index([status])
+  @@index([startDate, endDate])
+  @@map("offers")
+}
+
+model Redemption {
+  id             String    @id @default(uuid())
+  offerId        String
+  offer          Offer     @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  userIdentifier String
+  clientIp       String?
+  redeemedAt     DateTime  @default(now())
+
+  @@index([offerId])
+  @@index([userIdentifier])
+  @@map("redemptions")
+}
