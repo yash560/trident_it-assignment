@@ -41,8 +41,8 @@ export const Footer: React.FC = () => {
               <Code className="w-3.5 h-3.5" />
               <span>OpenAPI 3.1 Spec</span>
             </a>
-            <span className="flex items-center space-x-1">
-              <span>Engineered for Yash Jain</span>
+            <span className="inline-flex items-center gap-1 font-bold text-blue-600 dark:text-sky-400 bg-blue-500/10 px-2.5 py-1 rounded-md border border-blue-500/20 text-xs">
+              Powered by TheWebVale
             </span>
           </div>
         </div>
